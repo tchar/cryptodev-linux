@@ -8,6 +8,10 @@ KBUILD_CFLAGS += -I$(src) $(CRYPTODEV_CFLAGS)
 KERNEL_DIR ?= /lib/modules/$(shell uname -r)/build
 VERSION = 1.7
 PREFIX ?=
+PYTHON=/usr/bin/python2
+CTYPESGEN=$(CTYPESGEN_PATH)/ctypesgen.py
+PYTHON_BIND_FIX = crypto/python-bindings-fix.py
+
 
 cryptodev-objs = ioctl.o main.o cryptlib.o authenc.o zc.o util.o
 
@@ -38,6 +42,7 @@ clean:
 	make -C $(KERNEL_DIR) SUBDIRS=`pwd` clean
 	rm -f $(hostprogs) *~
 	CFLAGS=$(CRYPTODEV_CFLAGS) KERNEL_DIR=$(KERNEL_DIR) make -C tests clean
+	rm -f crypto/cryptodev.py
 
 check:
 	CFLAGS=$(CRYPTODEV_CFLAGS) KERNEL_DIR=$(KERNEL_DIR) make -C tests check
@@ -64,3 +69,6 @@ dist: clean
 	@echo Signing $(OUTPUT)
 	@gpg --output $(OUTPUT).sig -sb $(OUTPUT)
 	@gpg --verify $(OUTPUT).sig $(OUTPUT)
+
+python-bindings:
+	$(PYTHON) $(CTYPESGEN) --include-symbols="(_IOW|_IOWR|_IOR)" --include=sys/ioctl.h  --insert-file $(PYTHON_BIND_FIX) crypto/cryptodev.h -o crypto/cryptodev.py

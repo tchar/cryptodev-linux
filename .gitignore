@@ -6,6 +6,8 @@ Module.symvers
 *.ko
 *.o
 *.mod.c
+# For the python bytecode files
+*.pyc
 modules.order
 tests/async_cipher
 tests/async_hmac
@@ -27,3 +29,5 @@ examples/aes
 lib/benchmark
 tests/cipher-aead-srtp
 tests/cipher-gcm
+#For the generated cryptodev python binding
+crypto/cryptodev.py
